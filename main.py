@@ -1,9 +1,9 @@
 # main.py
 
 from preprocessing import preprocess_data
-from plots import generate_plots
 import numpy as np
 from model import Model
+import logging
 
 def read_data(path):
     data = []
@@ -26,8 +26,12 @@ def extract_features(data, f1, f2):
     return list(new_data)
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='run.log', filemode='w', level=logging.DEBUG)
+
+    logging.info('Starting...')
     data = read_data('penguins.csv')
     preprocess_data(data)
+    logging.info('Preprocessing Done.')
     #generate_plots(data)
 
     a = slice(1, 51)
@@ -35,7 +39,13 @@ if __name__ == '__main__':
     c = slice(101, 151)
 
     selected_data = extract_features(data, 'bill_depth_mm', 'flipper_length_mm')
+    logging.info(f"Extracted features: {selected_data[0][1]} and {selected_data[0][2]}")
 
-    model = Model(selected_data[a], selected_data[c], 0.4, 150, True)
+    model = Model(selected_data[a], selected_data[c])
+    logging.info('Initialized the model')
     model.train()
-    print(model.test())
+    logging.info('Trained the model')
+    acc = model.test()
+    logging.info(f'Model accuracy = {acc}')
+    print(acc)
+    logging.info('Finished.')

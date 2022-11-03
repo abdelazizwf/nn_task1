@@ -1,8 +1,9 @@
+import logging
 import random
 
 class Model:
 
-    def __init__(self, data1, data2, eta, epochs, bias_flag):
+    def __init__(self, data1, data2, eta=0.4, epochs=750, bias_flag=1):
         """
         data = [
             ['class', 'f1', 'f2'],
@@ -17,7 +18,10 @@ class Model:
         self.bias_flag = bias_flag
 
         self.label_map = {data1[0][0]: -1, data2[0][0]: 1}
-        self.weights = [random.random(), random.random(), random.random()]
+        self.weights = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
+
+        logging.debug(f'Model initialized with: eta={eta}, epochs={epochs}, bias_flag={bias_flag}')
+        logging.debug(f'Starting weights: {self.weights}')
 
     def partition(self, data):
         return data[:30], data[30:]
@@ -28,8 +32,9 @@ class Model:
 
         x0 = 1 if self.bias_flag else 0
 
-        for _ in range(self.epochs):
+        for i in range(self.epochs):
             self._train(training_data, x0)
+            logging.debug(f'Weights after epoch {i + 1}: {self.weights}')
 
     def _train(self, data, x0):
         for label, x1, x2 in data:
