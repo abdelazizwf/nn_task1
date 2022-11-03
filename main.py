@@ -6,6 +6,7 @@ import logging
 from plots import plot_features
 from itertools import combinations
 from util import *
+from pathlib import Path
 
 def read_data(path):
     data = []
@@ -18,9 +19,11 @@ def read_data(path):
 
 def pre_plots():
     data = read_data('penguins.csv')
+    path = Path('.') / 'plots'
+    preprocess_data(data)
     for f1, f2 in combinations(data[0][1:], 2):
         selected_data = extract_features(data, f1, f2)
-        plot_features(selected_data)
+        plot_features(selected_data, path)
 
 def main():
     logging.info('Starting...')
@@ -31,7 +34,7 @@ def main():
     logging.info('Preprocessing Done.')
 
     feature1 = 'bill_depth_mm'
-    feature2 = 'flipper_length_mm'
+    feature2 = 'bill_length_mm'
 
     a = get_class_slice(C1)
     b = get_class_slice(C2)
@@ -41,7 +44,7 @@ def main():
 
     logging.info(f"Extracted features: {feature1} and {feature2}")
 
-    model = Model(selected_data[a], selected_data[c])
+    model = Model(selected_data[a], selected_data[b])
     logging.info('Initialized the model')
 
     model.train()

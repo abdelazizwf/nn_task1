@@ -26,7 +26,7 @@ def extract_features(data, *features):
     data_t = transpose(data)
 
     for column in data_t:
-        if column[0] in features + ['species']:
+        if column[0] in features + ('species',):
             new_data.append(column)
 
     new_data = transpose(new_data)
