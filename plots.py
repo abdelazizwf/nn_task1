@@ -1,7 +1,6 @@
 # plots.py
 
 import matplotlib.pyplot as plt
-import numpy as np
 from util import *
 
 def plot_features(data):
@@ -12,7 +11,7 @@ def plot_features(data):
     for cls in CLASSES:
         sl = get_class_slice(cls)
         sl_data = data[sl]
-        sl_data = np.transpose(sl_data)
+        sl_data = transpose(sl_data)
         plt.scatter(sl_data[1], sl_data[2], c=cmap[cls], marker=mmap[cls], label=cls)
 
     plt.xlabel(data[0][1])

@@ -1,21 +1,22 @@
 # util.py
 
-import numpy as np
-
 C1 = 'Adelie'
 C2 = 'Gentoo'
 C3 = 'Chinstrap'
 CLASSES = [C1, C2, C3]
 
+def transpose(l):
+    return [[row[i] for row in l] for i in range(len(l[0]))]
+
 def extract_features(data, f1, f2):
     new_data = []
-    data_t = np.transpose(data)
+    data_t = transpose(data)
 
     for column in data_t:
         if column[0] in [f1, f2, 'species']:
             new_data.append(column)
 
-    new_data = np.transpose(new_data)
+    new_data = transpose(new_data)
     return list(new_data)
 
 def get_class_slice(cls):

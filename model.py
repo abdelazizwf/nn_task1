@@ -40,8 +40,6 @@ class Model:
 
     def _train(self, data, x0):
         for label, x1, x2 in data:
-            x1 = float(x1)
-            x2 = float(x2)
             t = self.label_map[label]
 
             net = (x0 * self.weights[0]) + (x1 * self.weights[1]) + (x2 * self.weights[2])
@@ -68,7 +66,7 @@ class Model:
         for label, x1, x2 in test_data:
             t = self.label_map[label]
 
-            net = (x0 * self.weights[0]) + (float(x1) * self.weights[1]) + (float(x2) * self.weights[2])
+            net = (x0 * self.weights[0]) + (x1 * self.weights[1]) + (x2 * self.weights[2])
 
             if net < 0:
                 y = -1
