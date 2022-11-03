@@ -21,6 +21,7 @@ class Model:
         self.weights = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
 
         logging.debug(f'Model initialized with: eta={eta}, epochs={epochs}, bias_flag={bias_flag}')
+        logging.debug(f"Label Map: {self.label_map}")
         logging.debug(f'Starting weights: {self.weights}')
 
     def partition(self, data):
@@ -29,6 +30,7 @@ class Model:
     def train(self):
         training_data = self.c1_train + self.c2_train
         random.shuffle(training_data)
+        logging.debug(f"Training Data: {training_data}")
 
         x0 = 1 if self.bias_flag else 0
 
@@ -58,6 +60,7 @@ class Model:
     def test(self):
         test_data = self.c1_test + self.c2_test
         random.shuffle(test_data)
+        logging.debug(f"Testing Data: {test_data}")
         
         x0 = 1 if self.bias_flag else 0
         correct = 0

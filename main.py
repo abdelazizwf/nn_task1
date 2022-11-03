@@ -41,7 +41,7 @@ if __name__ == '__main__':
     selected_data = extract_features(data, 'bill_depth_mm', 'flipper_length_mm')
     logging.info(f"Extracted features: {selected_data[0][1]} and {selected_data[0][2]}")
 
-    model = Model(selected_data[a], selected_data[c])
+    model = Model(selected_data[a], selected_data[b])
     logging.info('Initialized the model')
     model.train()
     logging.info('Trained the model')
