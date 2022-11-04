@@ -13,13 +13,15 @@ class Model:
         self.label_map = {labels[0]: -1, labels[1]: 1} # Representing classes as -1 and 1
         self.weights = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)] # Initializing weights
 
+        self.accuracy = -1
+
         logging.debug(f'Model initialized with: eta={eta}, epochs={epochs}, bias_flag={bias_flag}')
         logging.debug(f"Label Map: {self.label_map}")
         logging.debug(f'Starting weights: {self.weights}')
 
     def train(self):
         for i in range(self.epochs):
-            for [x1, x2], label in zip(self.x_train, self.y_train):
+            for [x1, x2], label in zip(self.x_train.values, self.y_train.values):
                 t = self.label_map[label] # Set the target to -1 or 1 according to the class
 
                 # Calculate the net value (W^T * X)
@@ -44,7 +46,7 @@ class Model:
     def test(self):
         correct = 0 # A counter for the correct prediction made by the model
 
-        for [x1, x2], label in zip(self.x_test, self.y_test):
+        for [x1, x2], label in zip(self.x_test.values, self.y_test.values):
             t = self.label_map[label] # Set the target to -1 or 1 according to the class
 
             # Calculate the net value (W^T * X)
@@ -61,4 +63,6 @@ class Model:
                 correct += 1
 
         # Return the accuracy as a percentage
-        return (correct / len(self.y_test)) * 100
+        self.accuracy =  (correct / len(self.y_test)) * 100
+
+        return self.accuracy
