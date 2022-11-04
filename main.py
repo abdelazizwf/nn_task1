@@ -2,6 +2,7 @@
 
 from itertools import combinations
 import logging
+import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -19,6 +20,10 @@ POST_PLOTS_PATH = Path('./post_plots/')
 def pre_plots(data):
     features = list(data.columns)
     features.remove('species')
+
+    if not os.path.exists(PRE_PLOTS_PATH):
+        os.makedirs(PRE_PLOTS_PATH)
+
     for f1, f2 in combinations(features, 2):
         plt.xlabel(f1)
         plt.ylabel(f2)
@@ -33,27 +38,41 @@ def pre_plots(data):
         plt.clf()
 
 
-# Black magick
 def partition_data(data, y_label):
+    # Create empty DataFrames
     training = pd.DataFrame()
     testing = pd.DataFrame()
 
+    # Group by the label, then add 30 training rows to the training DataFrame
+    # and 20 test rows to the testing frame
     for _, group in data.groupby(y_label):
         training = pd.concat([training, group.iloc[:29]], ignore_index=True)
         testing = pd.concat([testing, group.iloc[30:]], ignore_index=True)
 
+    # Randomly shuffle the data
     training = training.sample(frac=1)
     testing = testing.sample(frac=1)
 
-    return training.loc[:, training.columns != y_label], training[y_label], testing.loc[:, testing.columns != y_label], testing[y_label]
-
+    # Return the feature columns and label column separately for each DataFrame, such that the return values
+    # are training_feature_columns, training_label_column, testing_feature_columns, testing_label_coloumn
+    # Inspired by scikit-learn train_test_split function
+    return (
+        training.loc[:, training.columns != y_label],
+        training[y_label],
+        testing.loc[:, testing.columns != y_label],
+        testing[y_label]
+    )
 
 
 def preprocess(data):
-    data.fillna('pad', inplace=True) # Replace Na values with the last valid value of their column
-    data['gender'] = np.where(data['gender'] == 'male', 1, 0) # Convert `male` to 1, `female` to 0
-    data['flipper_length_mm'] = data['flipper_length_mm'] / 10 # Convert `flipper_length_mm` to Cm
-    data['body_mass_g'] = data['body_mass_g'] / 1000 # Convert `body_mass_g` to Kg
+    # Replace Na values with the last valid value of their column
+    data.fillna('pad', inplace=True)
+    # Convert `male` to 1, `female` to 0
+    data['gender'] = np.where(data['gender'] == 'male', 1, 0)
+    # Convert `flipper_length_mm` to Cm 
+    data['flipper_length_mm'] = data['flipper_length_mm'] / 10
+    # Convert `body_mass_g` to Kg
+    data['body_mass_g'] = data['body_mass_g'] / 1000
 
 
 def post_plots(data):
@@ -62,43 +81,56 @@ def post_plots(data):
 
     features.remove('species')
 
-    for f in combinations(features, 2):
-        for s in combinations(species, 2):
-            plt.xlabel(f[0])
-            plt.ylabel(f[1])
+    if not os.path.exists(POST_PLOTS_PATH):
+        os.makedirs(POST_PLOTS_PATH)
 
-            model = run(data, f, s)
+    acc_sum = 0
+
+    # Combine each combination of features with every combination of species
+    for f1, f2 in combinations(features, 2):
+        for s in combinations(species, 2):
+            plt.xlabel(f1)
+            plt.ylabel(f2)
+
+            # Run the model and retreive its data
+            model = run(data, [f1, f2], s)
             x_test, y_test = model.x_test, model.y_test
             x0 = model.x0
             w0, w1, w2 = model.weights
+            accuracy = model.accuracy
 
-            xs = []
-            ys = []
-            for x1, _ in x_test.values:
-                y = (-(w1 / w2) * x1) - ((x0 * w0) / w2)
-                xs.append(x1)
-                ys.append(y)
-            plt.plot(xs, ys)
+            acc_sum += accuracy
+            
+            # Calculate the y values of the line and plot it
+            line_eq = lambda x: (-(w1 / w2) * x) - ((x0 * w0) / w2)
+            line_ys = list(map(line_eq, x_test[f1].values))
+            plt.plot(x_test[f1], line_ys)
 
+            # Add the label column to the feature columns
             testing_data = x_test.assign(species=y_test)
 
+            # Plot the features of each species 
             for name, group in testing_data.groupby('species'):
-                plt.scatter(group[f[0]], group[f[1]], label=name)
+                plt.scatter(group[f1], group[f2], label=name)
+
+            plt.suptitle(f"Accuracy: {accuracy}")
 
             plt.legend()
 
-            path = POST_PLOTS_PATH / f"{f[0]}-{f[1]} for {s[0]}-{s[1]} at {str(model.accuracy)}.png"
+            # Save the plot to disk
+            path = POST_PLOTS_PATH / f"{f1}-{2} for {s[0]}-{s[1]}.png"
             plt.savefig(path, dpi=150)
             plt.clf()
 
+    print(f"Average Accuracy: {acc_sum / 30}")
+
 
 def run(data, features, species):
-    #features = ('bill_depth_mm', 'bill_length_mm')
-    #species = ('Gentoo', 'Chinstrap')
-
+    # Filter the data by species and extract the features
     filt = data['species'].isin(species)
-    sel_data = data.loc[filt, features + ('species',)]
+    sel_data = data.loc[filt, list(features) + ['species']]
 
+    # Partition the data
     x_train, y_train, x_test, y_test = partition_data(sel_data, 'species')
     logging.info(f"Extracted features: {features} for species {species}")
 
