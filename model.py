@@ -14,6 +14,7 @@ class Model:
         self.weights = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)] # Initializing weights
 
         self.accuracy = -1
+        self.confusion_matrix = [[0, 0], [0, 0]]
 
         logging.debug(f'Model initialized with: eta={eta}, epochs={epochs}, bias_flag={bias_flag}')
         logging.debug(f"Label Map: {self.label_map}")
@@ -46,6 +47,8 @@ class Model:
     def test(self):
         correct = 0 # A counter for the correct prediction made by the model
 
+        matrix_index = lambda x: 0 if x == -1 else 1
+
         for [x1, x2], label in zip(self.x_test.values, self.y_test.values):
             t = self.label_map[label] # Set the target to -1 or 1 according to the class
 
@@ -61,6 +64,8 @@ class Model:
             # Calculate error
             if t == y:
                 correct += 1
+
+            self.confusion_matrix[matrix_index(t)][matrix_index(y)] += 1
 
         # Return the accuracy as a percentage
         self.accuracy =  (correct / len(self.y_test)) * 100
