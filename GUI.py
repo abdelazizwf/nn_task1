@@ -3,7 +3,7 @@ from tkinter import *
 from main import run
 import pandas as pd
 import util
-from plots import plot_with_line
+from plots import plot_with_line, pre_plots
 
 root = Tk()
 root.title('Penguin classification')
@@ -76,7 +76,7 @@ c3_v=tk.IntVar(root)
 c3 = tk.Checkbutton(root, text='Chinstrap', command=upd, variable = c3_v, onvalue= 1)
 c3.grid(column = 3, row = 3)
 
-
+mx= tk.StringVar(root)
 
 
 def Listing():
@@ -101,8 +101,13 @@ def Listing():
     data= pd.read_csv('penguins.csv')
     util.preprocess(data)
     model = run(data, featureList, speciesList, learningRate, epochNo, biasStatus)
+    mx.set(f"{model.confusion_matrix[0]}\n{model.confusion_matrix[1]}")
     plot_with_line(model, featureList, speciesList)
     
+def visualiser():
+    data= pd.read_csv('penguins.csv')
+    util.preprocess(data)
+    pre_plots(data)
 
 myLabelT1 = Label(root, text = "Enter learning rate: ")
 myLabelT1.grid(column = 0, row = 5, sticky=W)
@@ -114,6 +119,9 @@ myLabelT2.grid(column = 0, row = 6, sticky=W)
 T2 = Text(root, height = 1, width = 10)
 T2.grid(column = 1, row = 6)
 
+myLabel2 = Label(root, textvariable= mx)
+myLabel2.grid(column = 1, row = 12)
+
 c9_v=tk.IntVar(root)
 c9 = tk.Checkbutton(root, text='Bias', onvalue=1, variable= c9_v)
 c9.grid(column = 3, row = 6)
@@ -121,5 +129,7 @@ c9.grid(column = 3, row = 6)
 myButton = Button( root, text = "run", height= 2,width = 10, command = Listing )
 myButton.grid(column = 1, row = 10)
 
+myButton1 = Button( root, text = "visualize", height= 2,width = 10, command = visualiser )
+myButton1.grid(column = 3, row = 10)
 
 root.mainloop()

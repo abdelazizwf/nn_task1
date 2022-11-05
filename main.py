@@ -72,6 +72,5 @@ if __name__ == '__main__':
     cs = ['Gentoo', 'Chinstrap']
 
     # Main Code Goes Here
-    model = run(data, fs, cs)
-
+    run_all(data)
     logging.info('Finished.')
