@@ -101,7 +101,7 @@ def Listing():
     data= pd.read_csv('penguins.csv')
     util.preprocess(data)
     model = run(data, featureList, speciesList, learningRate, epochNo, biasStatus)
-    mx.set(f"{model.confusion_matrix[0]}\n{model.confusion_matrix[1]}")
+    mx.set("confusion matrix: " + "\n" f"{model.confusion_matrix[0]}\n{model.confusion_matrix[1]}")
     plot_with_line(model, featureList, speciesList)
     
 def visualiser():
