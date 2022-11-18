@@ -96,11 +96,12 @@ def Listing():
     
     epochNo= int(T2.get(1.0, "end-1c"))
     learningRate= float(T1.get(1.0, "end-1c"))
+    MseThreshold= float(T3.get(1.0, "end-1c"))
     
     print(featureList, speciesList, epochNo, learningRate, biasStatus)
     data= pd.read_csv('penguins.csv')
     util.preprocess(data)
-    model = run(data, featureList, speciesList, learningRate, epochNo, biasStatus)
+    model = run(data, featureList, speciesList, learningRate, epochNo, biasStatus, MseThreshold)
     mx.set("confusion matrix: " + "\n" f"{model.confusion_matrix[0]}\n{model.confusion_matrix[1]}")
     plot_with_line(model, featureList, speciesList)
     
@@ -119,8 +120,14 @@ myLabelT2.grid(column = 0, row = 6, sticky=W)
 T2 = Text(root, height = 1, width = 10)
 T2.grid(column = 1, row = 6)
 
+myLabelT1 = Label(root, text = "Enter MSE threshold: ")
+myLabelT1.grid(column = 0, row = 7, sticky=W)
+T3 = Text(root, height = 1, width = 10)
+T3.grid(column = 1, row = 7)
+
 myLabel2 = Label(root, textvariable= mx)
 myLabel2.grid(column = 1, row = 12)
+
 
 c9_v=tk.IntVar(root)
 c9 = tk.Checkbutton(root, text='Bias', onvalue=1, variable= c9_v)
