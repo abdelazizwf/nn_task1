@@ -1,6 +1,5 @@
 import logging
 import random
-import numpy as np
 
 class Model:
 
@@ -31,17 +30,10 @@ class Model:
                 t = self.label_map[label] # Set the target to -1 or 1 according to the class
 
                 # Calculate the net value (W^T * X)
-                net = (self.x0 * self.weights[0]) + (x1 * self.weights[1]) + (x2 * self.weights[2])
-
-                # Activation function
-                if net < 0:
-                    y = -1
-                else:
-                    y = 1
+                y = (self.x0 * self.weights[0]) + (x1 * self.weights[1]) + (x2 * self.weights[2])
 
                 # Calculate error
                 e = t - y
-
                 
                 # Update the weights
                 self.weights[0] += self.eta * e * self.x0
@@ -50,7 +42,7 @@ class Model:
                 
                 # Calculate MSE
                 mse += e**2
-            
+
             mse *= 1 / len(self.y_train)
                 
             logging.debug(f'Weights after epoch {i + 1}: {self.weights}, MSE: {mse}')

@@ -45,3 +45,10 @@ def preprocess(data):
     # Convert `body_mass_g` to Kg
     data['body_mass_g'] = data['body_mass_g'] / 1000
 
+    # Convert all values to fractions
+    func = lambda x: x / 100
+    data['flipper_length_mm'] = data['flipper_length_mm'].apply(func)
+    data['bill_length_mm'] = data['bill_length_mm'].apply(func)
+    data['bill_depth_mm'] = data['bill_depth_mm'].apply(func)
+    data['body_mass_g'] = data['body_mass_g'].apply(func)
+
