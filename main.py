@@ -10,7 +10,7 @@ import pandas as pd
 from model import Model
 from plots import *
 from util import *
-
+from gui import run_gui
 
 def run_all(data):
     features = list(data.columns.values)
@@ -33,7 +33,7 @@ def run_all(data):
     print(f"Average Accuracy: {acc_sum / 30}")
 
 
-def run(data, features, species, eta=0.4, epochs=1000, bias_flag=True, mseThreshold= 0.01):
+def run(data, features, species, eta=0.4, epochs=1000, bias_flag=True, mse_threshold=0.1):
     # Filter the data by species and extract the features
     filt = data['species'].isin(species)
     sel_data = data.loc[filt, list(features) + ['species']]
@@ -42,7 +42,7 @@ def run(data, features, species, eta=0.4, epochs=1000, bias_flag=True, mseThresh
     x_train, y_train, x_test, y_test = partition_data(sel_data, 'species')
     logging.info(f"Extracted features: {features} for species {species}")
 
-    model = Model(x_train, y_train, x_test, y_test, species, eta, epochs, bias_flag, mseThreshold)
+    model = Model(x_train, y_train, x_test, y_test, species, eta, epochs, bias_flag, mse_threshold)
     logging.info('Initialized the model')
 
     model.train()
@@ -68,9 +68,7 @@ if __name__ == '__main__':
 
     logging.info('Preprocessing Done.')
 
-    fs = ['bill_length_mm', 'bill_depth_mm']
-    cs = ['Gentoo', 'Chinstrap']
-
     # Main Code Goes Here
-    run_all(data)
+    run_gui(run)
+
     logging.info('Finished.')

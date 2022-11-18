@@ -4,13 +4,14 @@ import numpy as np
 
 class Model:
 
-    def __init__(self, x_train, y_train, x_test, y_test, labels, eta=0.4, epochs=750, bias_flag=True, mseThreshold=0.01):
+    def __init__(self, x_train, y_train, x_test, y_test, labels, eta=0.4, epochs=750, bias_flag=True, mse_threshold=0.01):
         self.x_train, self.y_train = x_train, y_train
         self.x_test, self.y_test = x_test, y_test
         self.eta = eta # Learning rate
         self.epochs = epochs
         self.x0 = 1 if bias_flag else 0
-        self.mseThreshold= mseThreshold
+        self.mse_threshold = mse_threshold
+
         self.label_map = {labels[0]: -1, labels[1]: 1} # Representing classes as -1 and 1
         self.weights = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)] # Initializing weights
 
@@ -24,7 +25,8 @@ class Model:
 
     def train(self):
         for i in range(self.epochs):
-            mse_threshold= 0
+            mse = 0
+
             for [x1, x2], label in zip(self.x_train.values, self.y_train.values):
                 t = self.label_map[label] # Set the target to -1 or 1 according to the class
 
@@ -46,17 +48,15 @@ class Model:
                 self.weights[1] += self.eta * e * x1
                 self.weights[2] += self.eta * e * x2
                 
-                #calculate MSE
-                mse_threshold+= e**2
+                # Calculate MSE
+                mse += e**2
             
-            mse_threshold= 1/len(self.y_train)*mse_threshold
-            print(mse_threshold)
-            if mse_threshold< self.mseThreshold:
-                break
+            mse *= 1 / len(self.y_train)
+                
+            logging.debug(f'Weights after epoch {i + 1}: {self.weights}, MSE: {mse}')
 
-                
-                
-            logging.debug(f'Weights after epoch {i + 1}: {self.weights}')
+            if mse < self.mse_threshold:
+                break
 
     def test(self):
         correct = 0 # A counter for the correct prediction made by the model
